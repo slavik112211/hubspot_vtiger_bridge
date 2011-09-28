@@ -93,6 +93,7 @@ describe 'vTigerCRM leads adapter' do
       end
       
       it "should send a post request for lead creation" do
+        JSON.stub(:parse => '')
         response = stub('response', :body => 'some')
         #successful_response = stub("response", :body => IO.read(File.dirname(__FILE__) + '/fixtures/createLeadVtigerSuccess.js'))
         lead = {'firstname' => 'John', 'lastname' => 'Doe', 'company' => 'HubSpot', 

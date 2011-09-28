@@ -57,5 +57,5 @@
     "url": "http://www.hubspot.com/",
     "pageName": "How to Use Facebook for Business - Free HubSpot eBook"
    }],
-   "message": ""
+   "message": "hi there!"
 }
