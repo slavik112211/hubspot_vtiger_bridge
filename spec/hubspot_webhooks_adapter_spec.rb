@@ -15,4 +15,29 @@ describe "hubspot webhooks adapter" do
                         'website' => 'www.hubspot.com'
                         })
   end
+  
+  it "should provide empty string values to properties if they don't exist in incoming Hash" do
+    empty =  {"guid"=>nil, 
+    "publicLeadLink"=>nil, 
+    "firstName"=>nil, 
+    "lastName"=>nil, 
+    "jobTitle"=>nil, 
+    "company"=>nil,
+    "email"=>nil, 
+    "phone"=>nil, 
+    "website"=>nil, 
+    "industry"=>nil,
+    "message" => nil}
+    
+    vtiger_lead = HubspotWebhooksAdapter.to_vtiger_lead(empty)
+    vtiger_lead.should eql({'firstname' => '', 'lastname' => '', 'company' => '', 
+                        'email' => '', VTigerLeadCustomFields::HUBSPOT_LEAD_ID => '', 
+                        VTigerLeadCustomFields::HUBSPOT_INDUSTRY => '', 
+                        VTigerLeadCustomFields::HUBSPOT_PUBLIC_URL => '',
+                        'phone' => '',
+                        VTigerLeadCustomFields::HUBSPOT_MESSAGE => '',
+                        'designation' => '',
+                        'website' => ''
+                        })
+  end
 end
