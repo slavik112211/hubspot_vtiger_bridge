@@ -36,7 +36,7 @@ class VTigerCRMLeadsAdapter
     raise "not logged into vTiger" if @session_id == nil or @user_id == nil
     query = URI.encode("select * from Leads where " + VTigerLeadCustomFields::HUBSPOT_LEAD_ID + "='" + hubspot_id + "' limit 1;")
     response = JSON.parse(@httpclient.get_content(ADDRESS + '?operation=query&query=' + query + '&sessionName=' + @session_id))
-    return response['result'] == [] ? nil : response['result'][0]
+    response['result'][0]
   end
   
   def create_lead(lead)

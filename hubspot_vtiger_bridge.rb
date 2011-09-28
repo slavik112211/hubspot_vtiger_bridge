@@ -14,11 +14,11 @@ post '/' do
     vtiger_adapter = VTigerCRMLeadsAdapter.new
     vtiger_adapter.login
     lead_in_vtiger = vtiger_adapter.find_lead lead_for_vtiger[VTigerLeadCustomFields::HUBSPOT_LEAD_ID]
-    if lead_in_vtiger 
-      print "Lead found in vTiger, Hubspot id=" + lead_in_vtiger[VTigerLeadCustomFields::HUBSPOT_LEAD_ID]
-    else
+    #if lead_in_vtiger 
+      print "Lead found in vTiger, Hubspot id=" + lead_in_vtiger[VTigerLeadCustomFields::HUBSPOT_LEAD_ID] + "\n"
+    #else
       vtiger_adapter.create_lead lead_for_vtiger
-    end
+    #end
   rescue Exception => error
     pp error
   end
