@@ -108,11 +108,52 @@ describe 'vTigerCRM leads adapter' do
       end
       
       it "should throw an error if save was unsuccessful" do
-        response = stub('response', :body => IO.read(File.dirname(__FILE__) + '/fixtures/createLeadVtigerFailure.js'))
+        response = stub('response', :body => IO.read(File.dirname(__FILE__) + '/fixtures/createOrUpdateLeadVtigerFailure.js'))
         @httpclient.should_receive(:post).and_return(response)
         lambda { @vtiger_leads_adapter.create_lead({})}.should raise_exception(Exception, "creation of lead in vTiger failed")
       end
     end
+  end
+  
+  describe "update_lead" do
+    it "should not proceed with lead update if not logged in" do
+      lambda{ @vtiger_leads_adapter.update_lead 'lead'}.should raise_exception(Exception, "not logged into vTiger")
+    end
     
+    describe "logged in" do
+      before(:each) do
+        @vtiger_leads_adapter.session_id = '704dd2184e7bafe64a2de'
+        @vtiger_leads_adapter.user_id = '19x16'
+      end
+      
+      it "should send a post request for lead update" do
+        JSON.stub(:parse => '')
+        response = stub('response', :body => 'some')
+        lead = {'firstname' => 'John', 'lastname' => 'Doe', 'company' => 'HubSpot', 
+                        'email' => 'johndoe@hubspot.com', VTigerLeadCustomFields::HUBSPOT_LEAD_ID => '8a40135230f21bdb0130f21c255c0007', 
+                        VTigerLeadCustomFields::HUBSPOT_INDUSTRY => 'Software', 
+                        VTigerLeadCustomFields::HUBSPOT_PUBLIC_URL => 'https://app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken=',
+                        'assigned_user_id' => '19x16',
+                        'id' => '2x531'}
+        post_params = {'operation' => 'update', 'sessionName' => @vtiger_leads_adapter.session_id,
+                        'element' => '{"firstname":"John","lastname":"Doe","company":"HubSpot","email":"johndoe@hubspot.com","cf_620":"8a40135230f21bdb0130f21c255c0007","cf_622":"Software","cf_623":"https://app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken=","assigned_user_id":"19x16","id":"2x531"}'}
+        @httpclient.should_receive(:post).with(VTigerCRMLeadsAdapter::ADDRESS, post_params).and_return(response)
+        @vtiger_leads_adapter.update_lead lead
+      end
+      
+      it "should throw an error if update was unsuccessful" do
+        response = stub('response', :body => IO.read(File.dirname(__FILE__) + '/fixtures/createOrUpdateLeadVtigerFailure.js'))
+        @httpclient.should_receive(:post).and_return(response)
+        lambda { @vtiger_leads_adapter.update_lead({})}.should raise_exception(Exception, "update of lead in vTiger failed")
+      end
+    end
+  end
+  
+  describe "assign_new_lead_values" do
+    it "should assign new values to the existing lead object" do
+      old_lead = {"id" => '123', "name" => "Steve Jobs"}
+      new_lead = {"name" => "Chuck Norris"}
+      VTigerCRMLeadsAdapter.assign_lead_properties(old_lead, new_lead).should == {"id" => '123', "name" => "Chuck Norris"}
+    end
   end
 end

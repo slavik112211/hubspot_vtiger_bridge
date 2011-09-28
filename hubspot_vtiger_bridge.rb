@@ -14,7 +14,8 @@ post '/' do
     vtiger_adapter.login
     lead_in_vtiger = vtiger_adapter.find_lead lead_for_vtiger[VTigerLeadCustomFields::HUBSPOT_LEAD_ID]
     if lead_in_vtiger 
-      #print "Lead found in vTiger, Hubspot id=" + lead_in_vtiger[VTigerLeadCustomFields::HUBSPOT_LEAD_ID] + "\n"
+      lead_for_vtiger = VTigerCRMLeadsAdapter.assign_lead_properties(lead_in_vtiger,lead_for_vtiger)
+      vtiger_adapter.update_lead lead_for_vtiger
     else
       vtiger_adapter.create_lead lead_for_vtiger
     end
