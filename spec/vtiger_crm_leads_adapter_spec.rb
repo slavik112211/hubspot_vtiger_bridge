@@ -102,7 +102,7 @@ describe 'vTigerCRM leads adapter' do
                         VTigerLeadCustomFields::HUBSPOT_PUBLIC_URL => 'https://app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken='}
         
         post_params = {'operation' => 'create', 'sessionName' => @vtiger_leads_adapter.session_id, 'elementType' => 'Leads',
-                        'element' => '{"firstname":"John","lastname":"Doe","company":"HubSpot","email":"johndoe@hubspot.com","cf_620":"8a40135230f21bdb0130f21c255c0007","cf_622":"Software","cf_623":"https://app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken=","assigned_user_id":"19x16"}'}
+                        'element' => '{"firstname":"John","lastname":"Doe","company":"HubSpot","email":"johndoe@hubspot.com","cf_620":"8a40135230f21bdb0130f21c255c0007","cf_622":"Software","cf_624":"https://app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken=","assigned_user_id":"19x16"}'}
         @httpclient.should_receive(:post).with(VTigerCRMLeadsAdapter::ADDRESS, post_params).and_return(response)
         @vtiger_leads_adapter.create_lead lead
       end
@@ -136,7 +136,7 @@ describe 'vTigerCRM leads adapter' do
                         'assigned_user_id' => '19x16',
                         'id' => '2x531'}
         post_params = {'operation' => 'update', 'sessionName' => @vtiger_leads_adapter.session_id,
-                        'element' => '{"firstname":"John","lastname":"Doe","company":"HubSpot","email":"johndoe@hubspot.com","cf_620":"8a40135230f21bdb0130f21c255c0007","cf_622":"Software","cf_623":"https://app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken=","assigned_user_id":"19x16","id":"2x531"}'}
+                        'element' => '{"firstname":"John","lastname":"Doe","company":"HubSpot","email":"johndoe@hubspot.com","cf_620":"8a40135230f21bdb0130f21c255c0007","cf_622":"Software","cf_624":"https://app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken=","assigned_user_id":"19x16","id":"2x531"}'}
         @httpclient.should_receive(:post).with(VTigerCRMLeadsAdapter::ADDRESS, post_params).and_return(response)
         @vtiger_leads_adapter.update_lead lead
       end
