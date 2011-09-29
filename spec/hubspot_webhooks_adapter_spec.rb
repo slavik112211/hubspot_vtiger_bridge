@@ -8,7 +8,7 @@ describe "hubspot webhooks adapter" do
     vtiger_lead.should eql({'firstname' => 'John', 'lastname' => 'Doe', 'company' => 'HubSpot', 
                         'email' => 'johndoe@hubspot.com', VTigerLeadCustomFields::HUBSPOT_LEAD_ID => '8a40135230f21bdb0130f21c255c0007', 
                         VTigerLeadCustomFields::HUBSPOT_INDUSTRY => 'Software', 
-                        VTigerLeadCustomFields::HUBSPOT_PUBLIC_URL => 'https://app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken=',
+                        VTigerLeadCustomFields::HUBSPOT_PUBLIC_URL => 'app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken=',
                         'phone' => '555-123-1230',
                         VTigerLeadCustomFields::HUBSPOT_MESSAGE => 'hi there!',
                         'designation' => 'CEO',
@@ -39,5 +39,10 @@ describe "hubspot webhooks adapter" do
                         'designation' => '',
                         'website' => ''
                         })
+  end
+  
+  it "should remove the protocol signature from hubspot URL" do
+    vtiger_lead = HubspotWebhooksAdapter.to_vtiger_lead({'publicLeadLink' => 'https://app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken='})
+    vtiger_lead[VTigerLeadCustomFields::HUBSPOT_PUBLIC_URL].should == 'app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken='
   end
 end
