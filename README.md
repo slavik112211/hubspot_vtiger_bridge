@@ -1,0 +1,1 @@
+Copyright 2011 Vyacheslav Derevyanko of ERA Environmental Consulting Inc., released under the MIT license
