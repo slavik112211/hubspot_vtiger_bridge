@@ -5,9 +5,9 @@ require 'httpclient'
 require File.dirname(__FILE__) + '/vtiger_lead_custom_fields'
 
 class VTigerCRMLeadsAdapter
-  ADDRESS = 'http://www.era-intra.com/crm/webservice.php'
-  USERNAME = 'Slavik'
-  ACCESS_KEY = 'mGxbqCf1zbqlesfl'
+  ADDRESS = ENV['VTIGER_ADDRESS'] || ''
+  USERNAME = ENV['VTIGER_USERNAME'] || ''
+  ACCESS_KEY = ENV['VTIGER_ACCESS_KEY'] || ''
   
   attr_accessor :session_id, :user_id, :temporary_user_access_key
   
