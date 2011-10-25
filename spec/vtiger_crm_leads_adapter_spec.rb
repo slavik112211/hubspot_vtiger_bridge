@@ -94,7 +94,7 @@ describe 'vTigerCRM leads adapter' do
       
       it "should send a post request for lead creation" do
         JSON.stub(:parse => '')
-        response = stub('response', :body => 'some')
+        response = stub('response', :body => 'body')
         #successful_response = stub("response", :body => IO.read(File.dirname(__FILE__) + '/fixtures/createLeadVtigerSuccess.js'))
         lead = {'firstname' => 'John', 'lastname' => 'Doe', 'company' => 'HubSpot', 
                         'email' => 'johndoe@hubspot.com', VTigerLeadCustomFields::HUBSPOT_LEAD_ID => '8a40135230f21bdb0130f21c255c0007', 
@@ -104,7 +104,14 @@ describe 'vTigerCRM leads adapter' do
         post_params = {'operation' => 'create', 'sessionName' => @vtiger_leads_adapter.session_id, 'elementType' => 'Leads',
                         'element' => '{"firstname":"John","lastname":"Doe","company":"HubSpot","email":"johndoe@hubspot.com","cf_620":"8a40135230f21bdb0130f21c255c0007","cf_622":"Software","cf_624":"https://app.hubspot.com/leads/public/leadDetails?portalId=53&leadToken=","assigned_user_id":"19x16"}'}
         @httpclient.should_receive(:post).with(VTigerCRMLeadsAdapter::ADDRESS, post_params).and_return(response)
-        @vtiger_leads_adapter.create_lead lead
+        @vtiger_leads_adapter.create_lead(lead)
+      end
+      
+      it "should return a newly created lead as Hash" do
+        response = stub('response', :body => '{ "success": true, "result": { "firstname": "john"}}')
+        @httpclient.should_receive(:post).and_return(response)
+        created_lead = @vtiger_leads_adapter.create_lead({})
+        created_lead['firstname'].should eql('john')
       end
       
       it "should throw an error if save was unsuccessful" do
@@ -141,6 +148,13 @@ describe 'vTigerCRM leads adapter' do
         @vtiger_leads_adapter.update_lead lead
       end
       
+      it "should return a newly updated lead as Hash" do
+        response = stub('response', :body => '{ "success": true, "result": { "firstname": "john"}}')
+        @httpclient.should_receive(:post).and_return(response)
+        created_lead = @vtiger_leads_adapter.update_lead({})
+        created_lead['firstname'].should eql('john')
+      end
+      
       it "should throw an error if update was unsuccessful" do
         response = stub('response', :body => IO.read(File.dirname(__FILE__) + '/fixtures/createOrUpdateLeadVtigerFailure.js'))
         @httpclient.should_receive(:post).and_return(response)
@@ -154,6 +168,33 @@ describe 'vTigerCRM leads adapter' do
       old_lead = {"id" => '123', "name" => "Steve Jobs"}
       new_lead = {"name" => "Chuck Norris"}
       VTigerCRMLeadsAdapter.assign_lead_properties(old_lead, new_lead).should == {"id" => '123', "name" => "Chuck Norris"}
+    end
+  end
+  
+  describe 'create event' do
+    it "should not proceed with event creation if not logged in" do
+      lambda{ @vtiger_leads_adapter.create_event 'id', 'event'}.should raise_exception(Exception, "not logged into vTiger")
+    end
+    
+    describe "logged in" do
+      before(:each) do
+        @vtiger_leads_adapter.session_id = '704dd2184e7bafe64a2de'
+        @vtiger_leads_adapter.user_id = '19x16'
+      end
+     
+      it "should send a post request for event creation with vtiger user and lead assigned" do
+        JSON.stub(:parse => '')
+        response = stub('response', :body => 'body')
+        event = {'subject' => 'Website form filled', 
+                 'eventstatus' => 'Held', 
+                 VTigerEventCustomFields::HUBSPOT_FORM_URL => 'www.form-url.com'
+                }
+        
+        post_params = {'operation' => 'create', 'sessionName' => @vtiger_leads_adapter.session_id, 'elementType' => 'Events',
+                        'element' => '{"subject":"Website form filled","eventstatus":"Held","cf_626":"www.form-url.com","assigned_user_id":"19x16","parent_id":"2x531"}'}
+        @httpclient.should_receive(:post).with(VTigerCRMLeadsAdapter::ADDRESS, post_params).and_return(response)
+        @vtiger_leads_adapter.create_event('2x531', event)
+      end
     end
   end
 end

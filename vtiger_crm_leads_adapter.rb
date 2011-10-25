@@ -45,6 +45,7 @@ class VTigerCRMLeadsAdapter
     post_params = {'operation' => 'create', 'sessionName' => @session_id, 'elementType' => 'Leads', 'element' => JSON.generate(lead)}
     response = @httpclient.post(ADDRESS, post_params)
     raise "creation of lead in vTiger failed" if JSON.parse(response.body)['success'] == false
+    JSON.parse(response.body)['result']
   end
   
   def update_lead(lead)
@@ -52,6 +53,17 @@ class VTigerCRMLeadsAdapter
     post_params = {'operation' => 'update', 'sessionName' => @session_id, 'element' => JSON.generate(lead)}
     response = @httpclient.post(ADDRESS, post_params)
     raise "update of lead in vTiger failed" if JSON.parse(response.body)['success'] == false
+    JSON.parse(response.body)['result']
+  end
+  
+  def create_event(lead_id, event)
+    raise "not logged into vTiger" if @session_id == nil or @user_id == nil
+    event['assigned_user_id'] = @user_id
+    event['parent_id'] = lead_id
+    post_params = {'operation' => 'create', 'sessionName' => @session_id, 'elementType' => 'Events', 'element' => JSON.generate(event)}
+    response = @httpclient.post(ADDRESS, post_params)
+    raise "creation of event in vTiger failed" if JSON.parse(response.body)['success'] == false
+    JSON.parse(response.body)['result']
   end
   
   def VTigerCRMLeadsAdapter.assign_lead_properties old_lead, new_lead
