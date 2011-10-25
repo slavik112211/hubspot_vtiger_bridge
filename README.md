@@ -44,11 +44,28 @@ Adjusting one of the fields is mandatory for correct script operation - hubspotI
 or it already exists, and we only need to update it.
 
 ### Vtiger credentials/address
-Setting credentials for vtiger is moved out of the code into environmental variables.
+Setting credentials for vtiger is moved out of the code into environment variables.
 There are 3 envvars to set: VTIGER\_ACCESS\_KEY, VTIGER\_ADDRESS, VTIGER\_USERNAME.
 When hosted on Heroku, setting of envvars can be done this way (in console from a folder where you've checked out the git project):
 
     heroku config:add VTIGER_ACCESS_KEY='your-access-key', VTIGER_ADDRESS='your-installation-url', VTIGER_USERNAME='your-username'
+    
+### Storing Hubspot form-filling events as Vtiger's lead calendar events
+Not only the leads are transmitted to VtigerCRM, but also Hubspot 're-conversion events' (filling the form on tracked website).
+They are represented in Vtiger as calendar events that happened to lead. This also requires adjustments and setup.
+The url to Hubspot's filled form is stored in Vtiger's custom field for calendar events. This field has to be recreated on your Vtiger installation.
+This can be done in Settings > Module Manager > Calendar > Calendar Custom Fields. Create a field called 'Form URL' with type 'URL'.
+After that you have to substitute the 'Form URL' JSON property name in vtiger\_event\_custom\_fields.rb to the name that got assigned by Vtiger to your 'Form URL' field.
+scripts/get\_vtiger\_event\_structure.rb can be used to determine it.
+
+Also, the timezone location of your Vtiger server has to be specified with environment variable VTIGER_TIMEZONE. 
+This is done to properly set the 'Event starts at' and 'Event ends at' properties of the Vtiger calendar event, adjusted to Vtiger's installation location.
+Hubspot transmits the form-filling datetime in UTC and this has to be adjusted to Vtiger's server timezone.
+When hosted on Heroku:
+
+    heroku config:add VTIGER_TIMEZONE='America/Montreal'
+[The tz database](http://www.twinsun.com/tz/tz-link.htm) is used to determine locations like 'America/Montreal'.
+scripts/get\_country\_timezone\_locations.rb can be used to get the list of possible locations corresponding to [ISO 3166 country codes](http://en.wikipedia.org/wiki/ISO_3166-1).
 
 ### Logging
 Web-server logging can be used to check on correct setup. With Heroku hosting it can be done this way (in console from a folder where you've checked out the git project):
@@ -64,6 +81,8 @@ Web-server logging can be used to check on correct setup. With Heroku hosting it
 * [Heroku quickstart](http://devcenter.heroku.com/articles/quickstart)
 * [Hosting a sinatra application on Heroku](http://devcenter.heroku.com/articles/rack#sinatra)
 * [Heroku server env vars](http://devcenter.heroku.com/articles/config-vars)
+* [TZInfo README](http://tzinfo.rubyforge.org/doc/files/README.html)
+* [Timezone database](http://www.twinsun.com/tz/tz-link.htm)
 
 ## Contact
 Copyright 2011 Vyacheslav Derevyanko of ERA Environmental Consulting Inc., contact slavik2121[at]gmail.com, released under the MIT license
