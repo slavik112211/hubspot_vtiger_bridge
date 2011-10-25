@@ -16,6 +16,7 @@ describe 'hubspot vtiger leads management integration' do
   end
   
   it "should search for lead from vtiger" do
+    HubspotWebhooksAdapter.stub(:extract_event)
     vtiger_adapter = stub('adapter', :login => nil, :create_lead => nil, :create_event => nil, :update_lead => nil)
     vtiger_adapter.should_receive(:find_lead).with('8a40135230f21bdb0130f21c255c0007').and_return({'id' => nil})
     VTigerCRMLeadsAdapter.stub(:new).and_return(vtiger_adapter)
@@ -48,6 +49,7 @@ describe 'hubspot vtiger leads management integration' do
     end
     
     it "should create lead in vtiger if nothing found" do
+      HubspotWebhooksAdapter.stub(:extract_event)
       @vtiger_adapter.stub(:find_lead => nil, :create_event => nil)
       @vtiger_adapter.should_receive(:create_lead).with(@lead).and_return({'id' => nil})
       VTigerCRMLeadsAdapter.stub(:new).and_return(@vtiger_adapter)
@@ -77,6 +79,7 @@ describe 'hubspot vtiger leads management integration' do
         'designation' => 'CEO',
         'website' => 'www.hubspot.com'
         }
+      HubspotWebhooksAdapter.stub(:extract_event)
       @vtiger_adapter.stub(:find_lead => old_lead, :create_event => nil)
       VTigerCRMLeadsAdapter.should_receive(:assign_lead_properties).with(old_lead, @lead).and_return(lead_after_merge)
       @vtiger_adapter.should_receive(:update_lead).with(lead_after_merge)

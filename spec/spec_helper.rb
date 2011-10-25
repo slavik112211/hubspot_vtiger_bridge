@@ -6,7 +6,7 @@ require 'sinatra'
 require 'rack/test'
 require 'rspec'
 require 'uri'
-
+require 'tzinfo'
 
 # set test environment
 set :environment, :test

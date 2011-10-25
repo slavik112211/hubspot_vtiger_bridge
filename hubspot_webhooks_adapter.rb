@@ -1,9 +1,12 @@
 require 'json'
 require 'uri'
+require 'tzinfo'
 require File.dirname(__FILE__) + '/vtiger_lead_custom_fields'
 require File.dirname(__FILE__) + '/vtiger_event_custom_fields'
 
 module HubspotWebhooksAdapter
+  VTIGER_TIMEZONE = ENV['VTIGER_TIMEZONE'] || 'America/Montreal'
+  
   def HubspotWebhooksAdapter.to_vtiger_lead hubspot_lead
     lead_link = remove_url_protocol hubspot_lead['publicLeadLink']
     {'firstname' => hubspot_lead['firstName'] || '', 
@@ -22,15 +25,19 @@ module HubspotWebhooksAdapter
   
   def HubspotWebhooksAdapter.extract_event hubspot_lead
     conversion_event = hubspot_lead['lastConversionEvent']
+    
     if conversion_event
+      timezone = TZInfo::Timezone.get(VTIGER_TIMEZONE)
+      vtiger_local_date = timezone.strftime('%d-%m-%Y', Time.at(conversion_event['convertDate']/1000).utc)
+      vtiger_local_time = timezone.strftime('%H:%M', Time.at(conversion_event['convertDate']/1000).utc)
       {'subject' => 'Website form filled', 
        'eventstatus' => 'Held', 
        'activitytype'=> 'Undefined', 
        'description' => 'Form name: ' + (conversion_event['formName']),
-       'date_start' => Time.at(conversion_event['convertDate']/1000).strftime('%d-%m-%Y'),
-       'time_start' => Time.at(conversion_event['convertDate']/1000).strftime('%H:%M'),
-       'due_date' => Time.at(conversion_event['convertDate']/1000).strftime('%d-%m-%Y'),
-       'time_end' => Time.at(conversion_event['convertDate']/1000).strftime('%H:%M'),
+       'date_start' => vtiger_local_date,
+       'time_start' => vtiger_local_time,
+       'due_date' => vtiger_local_date,
+       'time_end' => vtiger_local_time,
        'duration_hours' => 0,
        VTigerEventCustomFields::HUBSPOT_FORM_URL => remove_url_protocol(conversion_event['url'])
       }

@@ -70,6 +70,15 @@ describe "hubspot webhooks adapter" do
       vtiger_event = HubspotWebhooksAdapter.extract_event(empty)
       vtiger_event.should be_nil
     end
+    
+    it "should assign the date and time of event to vtiger using local vtiger's timezone" do
+      HubspotWebhooksAdapter::VTIGER_TIMEZONE = 'America/Montreal'
+      timezone = stub('timezone')
+      timezone.should_receive(:strftime).with('%d-%m-%Y', Time.parse('2011-10-24 18:37:14 UTC'))
+      timezone.should_receive(:strftime).with('%H:%M', Time.parse('2011-10-24 18:37:14 UTC'))
+      TZInfo::Timezone.should_receive(:get).with('America/Montreal').and_return(timezone)
+      HubspotWebhooksAdapter.extract_event(JSON.parse(IO.read(File.dirname(__FILE__) + '/fixtures/incomingLeadDataHubspotSingleLead.js')))
+    end
   end
   
   describe "remove url protocol" do
